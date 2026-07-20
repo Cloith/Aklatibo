@@ -1,0 +1,22 @@
+# .NET
+**/bin/
+**/obj/
+
+# Secrets
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Linux crash dumps
+core
+core.*
+
+# Logs
+*.log
+
+.idea/

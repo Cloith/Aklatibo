@@ -1,0 +1,14 @@
+bin/
+obj/
+
+.env
+.env.*
+
+.vs/
+.vscode/
+
+core
+core.*
+
+*.log
+e-books/

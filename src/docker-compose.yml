@@ -1,0 +1,61 @@
+services:
+
+  aklatibo-api:
+    depends_on:
+      - postgres
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: build       
+    working_dir: /src
+    volumes:
+      - ./backend:/src           
+      - /src/bin
+      - /src/obj
+    command: dotnet watch run --urls=http://0.0.0.0:5000
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=aklatibo;Username=aklatibo;Password=${POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      GoogleAuth__ClientId: ${GOOGLE_CLIENT_ID}
+
+  landing-page:
+    build:
+      context: ./landing-page
+      dockerfile: Dockerfile
+    container_name: aklatibo-landing-page
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: aklatibo-tunnel
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN} --protocol http2
+    restart: always
+    depends_on:
+      - aklatibo-api
+      - landing-page
+
+  postgres:
+    image: postgres:17
+    container_name: aklatibo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aklatibo
+      POSTGRES_USER: aklatibo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -1,0 +1,16 @@
+# Ignore local node packages
+node_modules
+.npm
+
+# Ignore next.js build artifacts
+.next
+out
+dist
+
+# Ignore mobile build assets if they are in the same tree
+android/.gradle
+android/app/build
+
+# Ignore OS files
+.DS_Store
+.git
